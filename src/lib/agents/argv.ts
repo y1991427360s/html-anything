@@ -21,7 +21,7 @@ export class UnsupportedAgentProtocolError extends Error {
 }
 
 export function buildArgv(agent: string, _opts: AgentArgvOpts = {}): string[] {
-  const { model } = _opts;
+  const model = _opts.model && _opts.model !== "default" ? _opts.model : undefined;
   switch (agent) {
     case "claude":
       return [

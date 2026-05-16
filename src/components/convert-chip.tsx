@@ -25,10 +25,9 @@ export function ConvertChip() {
 
   // Only show in split mode — when only one pane is visible there's no
   // divider to hang off, and the toolbar button is already obvious.
-  if (layoutMode !== "split") return null;
-
   const agentInfo = agents.find((a) => a.id === agent);
   const model = agent ? agentModels[agent] ?? "default" : "default";
+  const isSplitMode = layoutMode === "split";
   const canConvert =
     !!agent && !!content.trim() && status !== "running" && !agentInfo?.unsupported;
 
@@ -57,14 +56,18 @@ export function ConvertChip() {
   useEffect(() => {
     const onKey = (e: KeyboardEvent) => {
       if ((e.metaKey || e.ctrlKey) && e.key === "Enter") {
-        if (isRunning || !canConvert) return;
+        if (!isSplitMode || isRunning || !canConvert) return;
         e.preventDefault();
         onClick();
       }
     };
     window.addEventListener("keydown", onKey);
     return () => window.removeEventListener("keydown", onKey);
-  }, [onClick, isRunning, canConvert]);
+  }, [onClick, isSplitMode, isRunning, canConvert]);
+
+  // Only show in split mode. Keep this after hooks so toggling layouts does
+  // not change the hook call order and crash React.
+  if (!isSplitMode) return null;
 
   return (
     <div
